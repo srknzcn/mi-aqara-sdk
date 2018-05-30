@@ -1,58 +1,57 @@
-# mi-aqara-sdk
+# mi-aqara2-sdk
 
-作者：jsonzhou 2018/02/10
+This repo forked from zzyss86/mi-aqara-sdk
 
-小米(xiaomi)、绿米(aqara)、米家智能家庭(mijia)开发工具库。
+Thanks to jsonzhou
 
-## 背景
 
-小米IoT开发者平台不支持个人开发者申请，有一些极客的玩法没有API实现不了。通过`mi-aqara-sdk`可以在Node.js平台实现米家智能家庭的互联互通。
+## Background
+`mi-aqara-sdk` communicates only in the LAN. The protocols or mechanisms used are: udp protocol, multicast, AES encryption and decryption.
 
-`mi-aqara-sdk`只在局域网中通讯，使用的协议或机制主要有：udp协议，组播，AES加解密。
 
-## 基本使用
+## Usage
 
-### 安装
+### Installation
 
-	npm install --save-dev mi-aqara-sdk
+	npm install --save-dev mi-aqara2-sdk
 	
-### 使用
+### Usage
 
-	const MiAqara = require('mi-aqara-sdk');
-	MiAqara.create(gateways, opts); // 创建
-	MiAqara.start(); // 启动
+	const MiAqara = require('mi-aqara2-sdk');
+	MiAqara.create(gateways, opts); // Create
+	MiAqara.start(); // Start
 
-## 接口
+## Interface
 
-### create(gateways, opts) 创建SDK服务
+### create(gateways, opts) Create SDK Service
 
-- gateways 网关列表，支持数组(多个)或对象(单个)
-	- sid 网关设备ID （获取方式见文末）
-	- password 网关密码 （获取方式见文末）
-	- iv [可选]加密初始向量，有默认值
-- opts 服务选项
-	- multicastAddress 组播IP，默认：224.0.0.50
-	- multicastPort 组播端口，默认：4321
-	- serverPort 服务监听端口，默认：9898
-	- bindAddress SDK所在设备具有多网络时需要设置
-	- onReady 网关及子设备已就绪, 多个网关可能会调用多次
-	- onMessage 所有消息回调
+- gateways
+	- sid: gateway device ID (see the end of the document for how to obtain it)
+	- password: gateway password (acquisition method see the end of the text)
+	- iv: [Optional] Encrypt the initial vector with default values
+- opts Options
+	- multicastAddress: Multicast IP, default：224.0.0.50
+	- multicastPort: multicast port, default: 4321
+	- serverPort: service listening port, default: 9898
+	- bindAddress 
+	- onReady: gateway and child devices are ready, multiple gateways may be called multiple times
+	- onMessage: all message callbacks
 
-#### 示例
+#### Examples
 
 		MiAqara.create([{
 		    sid: '7811dcb28bde',
 		    password: '**A68343AD********'
 		}], {
-		    onReady (msg) { // 网关及子设备已找到, 多个网关可能会调用多次
+		    onReady (msg) { // gateway and child devices have been found
 		        // console.log('onReady', msg);
 		    },
-		    onMessage (msg) { // 所有消息类型
+		    onMessage (msg) { message(s) received
 		        // console.log('onMessage', msg);
 		    }
 		});
 		
-#### 事件`onReady`,`onMessage`中的`msg`结构示例
+#### Event`onReady`,`msg` structure example in `onMessage`
 
 	{
 		"cmd": "read_ack",
@@ -62,59 +61,59 @@
 		"data": "{\"voltage\":3012}"
 	}
 	
-#### `cmd`枚举列表(消息类型)
+#### `cmd` Enumeration list (message type)
 
-- iam 查找网关时，网关的响应包
-- get_id_list_ack 网关查找子设备列表时消息响应 
-- report 网关及子设备状态变化时主动上报
-- read_ack 读设备时消息响应
-- write_ack 写设备时消息响应
-- heartbeat 心跳包，网关每10秒钟发送一次, 主要更新网关token。子设备心跳，插电设备10分钟发送一次，其它1小时发送一次
-- server_ack 通用回复, 如发送报文JSON解析出错，会回复此事件
+- iam: Gateway response packet
+- get_id_list_ack: message response when gateway looks up child device list
+- report: automatically when the status of gateways and sub-devices changes
+- read_ack: message response when reading device
+- write_ack: message response when writing device
+- heartbeat: heartbeat packets, which are sent by the gateway every 10 seconds, mainly to update the gateway token. Heartbeat of the child device. The plug-in device sends it once every 10 minutes and once every other hour.
+- server_ack common reply, such as JSON parsing of the sent message, will reply this event
 		
-### start() 启动，一般创建完后马上启动
+### start() Start, normally start immediately after creation
 
 	MiAqara.start();
 
-### getGatewayBySid(sid) 根据网关设备ID查找网关对象
+### getGatewayBySid(sid) Find gateway object based on gateway device ID
 
 	MiAqara.getGatewayBySid('7811dcb28bde')
 	
-### getGatewayList() 获取所有网关列表数组
+### getGatewayList() Get an array of all the gateways
 
 	MiAqara.getGatewayList();
 	
-### controlLight(opts) 控制彩灯
+### controlLight(opts) Controls the gateway light
 
-- opts.sid 网关设备ID
-- opts.power 开关
-- opts.hue 色相
-- opts.saturation 饱和度
-- opts.brightness 亮度
+- opts.sid: Gateway device ID
+- opts.power: Power state
+- opts.hue: HUE
+- opts.saturation: SATURATION
+- opts.brightness BRIGHTNESS
 
-#### 关灯
+#### Turn off the light
 	MiAqara.controlLight({sid:'7811dcb28bde',power:false});
 
-#### 开灯
+#### Turn on the light
 	MiAqara.controlLight({sid:'7811dcb28bde',power:true});
 	
-### getDeviceBySid(sid) 获取所有子设备(感应器)列表数组
+### getDeviceBySid(sid) Get an array of all child devices (sensors)
 
 	MiAqara.getDeviceBySid('158d0001b8849f');
 	
-### getDevicesByGatewaySid(gatewaySid) 根据网关ID查找所属子设备列表
+### getDevicesByGatewaySid(gatewaySid) Finds the child device list based on the gateway ID
 
 	MiAqara.getDevicesByGatewaySid('7811dcb28bde')；
 	
-### getDevicesByGatewaySidAndModel(gatewaySid, model) 根据网关ID及子设备型号查找所属子设备列表
+### getDevicesByGatewaySidAndModel(gatewaySid, model) Finds the child device list based on the gateway ID and child device model
 
-#### 获取网关下所有开关子设备
+#### Get all switching devices under the gateway
 
 	MiAqara.getDevicesByGatewaySidAndModel('7811dcb28bde', 'switch');
 	
-#### 子设备型号及中英文名称对照
+#### Sub-device model and Chinese-English name comparison
 
-以下key为model(型号)
+The following key is model (model)
 
 	const DEVICE_MAP = {
 	    'gateway': {name:'Gateway', name_cn:'网关'},
@@ -141,197 +140,193 @@
 	    'sensor_wleak.aq1': {name:'WaterDetector', name_cn:'水浸传感器'}
 	};
 
-### getDevicesByModel(model) 根据型号获取所有对应子设备
+### getDevicesByModel(model) Get all corresponding child devices based on model
 
-#### 所有开关设备，包括挂载在不同网关的上子设备
+#### All switch devices, including upper child devices mounted on different gateways
 
 	MiAqara.getDevicesByModel('switch')
 	
-### getDeviceList() 获取所有子设备列表数据
+### getDeviceList() Get all child device list data
 
 	MiAqara.getDeviceList()
 	
-### change ({sid, gatewaySid, model, data}) 子设备状态变更
+### change ({sid, gatewaySid, model, data}) Child Device Status Change
 
-- change({sid,data}) 改变指定设备(子设备ID:sid)的状态
-- change({gatewaySid, model, data}) 改变指定网关下挂载的指定型号的子设备状态
-- change({model, data}) 改变所有指定型号的子设备状态
+- change({sid,data}) changes the state of the specified device (child device ID: sid)
+- change({gatewaySid, model, data}) Change the state of sub-devices of the specified model mounted under the specified gateway
+- change({model, data}) Change the status of all specified model sub-devices
 
-## 其它说明
+## Other instructions
 
-### 一、设备状态`data`结构说明 (部份)
+### First, the device state `data` structure description (part)
 	
-#### 门窗磁传感器 (model: magnet)
-
+#### Door and Window Magnetic Sensor (model: magnet)
 	{
 		"status": "close" //close:关闭; open:打开
 	}
 
-#### 人体感应器 (model: motion)
+#### Body Sensor (model: motion)
 
 	{
-		"status": "motion" //motion:有人移动
+		"status": "motion" // motion: someone moved
 	}
-	// 或
+	// Or
 	{
-		"no_motion" "120" //120秒没人移动
+		"no_motion" "120" // 120 seconds nobody moves
 	}
 	
-#### 开关/按钮 (model: switch)
+#### Switch / Button (model: switch)
 
 	{
-		"status": "click" //click:单击; double_click:双击
+		"status": "click"  //click:click; double_click:double click
 	}
 
-#### 温度湿度传感器 (model: sensor_ht)
+#### Temperature and Humidity Sensor (model: sensor_ht)
 
 	{
 		"temperature": "1741",
 		"humidity": "7593"
 	}
 
-#### 单按钮墙壁开关 (model: ctrl_neutral1)
+#### One Button Wall Switch (model: ctrl_neutral1)
 
 	{
-		"channel_0": "on" //off是关闭
+		"channel_0": "on"
 	}
 
-#### 双按钮墙壁开关 (model: ctrl_neutral2)
-
-	{
-		"channel_0": "on",
-		"channel_1": "off"
-	}
-
-#### 单按钮墙壁开关零火版 (model: ctrl_ln1)
-
-	{
-		"channel_0": "on" //off是关闭
-	}
-
-#### 双按钮墙壁开关零火版 (model: ctrl_ln2)
+#### Two Button Wall Switch (model: ctrl_neutral2)
 
 	{
 		"channel_0": "on",
 		"channel_1": "off"
 	}
 
-#### 86型无线单按钮开关 (model: 86sw1)
+#### Single Button Wall Switch Zero Fire Version (model: ctrl_ln1)
 
 	{
-		"channel_0": "click" //click:单击; double_click:双击
+		"channel_0": "on"
 	}
 
-#### 86型无线双按钮开关 (model: 86sw2)
+#### Two Button Wall Switch Zero Fire Version (model: ctrl_ln2)
 
 	{
-		"channel_0": "click" //click:单击; double_click:双击
-		"channel_1": "click" //click:单击; double_click:双击
+		"channel_0": "on",
+		"channel_1": "off"
 	}
 
-#### 插座 (model: plug)
+#### Type 86 Wireless Single Button Switch (model: 86sw1)
 
 	{
-		"status": "on" //off是关闭
+		"channel_0": "click" //click:click; double_click:double click
 	}
 
-#### 86型墙壁插座 (model: 86plug)
+#### Model 86 wireless two-button switch (model: 86sw2)
 
 	{
-		"status": "on" //off是关闭
+		"channel_0": "click" //click:click; double_click:double click
+		"channel_1": "click" //click:click; double_click:double click
 	}
 
-#### 魔方 (model: cube)
+#### Socket (model: plug)
+
+	{
+		"status": "on" 
+	}
+
+#### Socket (model: 86plug)
+
+	{
+		"status": "on"
+	}
+
+#### Cube (model: cube)
 
 	{
 		"status": ""
 	}
 
-status取值：
-
+Status Values:
 - move
 - flip180
 - tap_twice
 - shake_air
 - flip90
 
-#### 烟雾警报器 (model: smoke)
+#### Smoke sensor (model: smoke)
 
 	{
 		"alarm": "0" // 0，1，2
 	}
 
-#### 天然气警报器 (model: natgas)
+#### Gas sensor (model: natgas)
 
 	{
 		"alarm": "0" // 0，1，2
 	}
 
-#### 电动窗帘 (model: curtain)
+#### Curtain (model: curtain)
 
 	{
 		"curtain_level": ""
 	}
 
-#### 门磁感应 第二代 (model: sensor_magnet.aq2)
+#### Magnetic induction second generation (model: sensor_magnet.aq2)
 
 	{
-		"status": "close" //close:关闭; open:打开
+		"status": "close"
 	}
 
-#### 人体感应器 第二代 (model: sensor_motion.aq2)
+#### Human Sensor Second Generation (model: sensor_motion.aq2)
 
 	{
-		"status": "motion" //motion:有人移动
+		"status": "motion" //Motion: someone moves
 	}
 	// 或
 	{
-		"no_motion" "120" //120秒没人移动
+		"no_motion" "120" //120 seconds nobody moved
 	}
 
-#### 按钮/开关 第二代 (model: sensor_switch.aq2)
+#### Button/Switch Second Generation (model: sensor_switch.aq2)
 
 	{
-		"status": "click" //click:单击; double_click:双击
+		"status": "click" //click:click; double_click:double_click
 	}
 
-#### 温度湿度传感器 第二代 (model: weather.v1)
+#### Temperature and humidity sensor Second generation (model: weather.v1)
 
 	{
 		"temperature": "1741",
 		"humidity": "7593"
 	}
 
-#### 水浸传感器 (model: sensor_wleak.aq1)
+#### Water Sensor (model: sensor_wleak.aq1)
 
 	{
-		"status": "leak" //leak:水浸; no_leak:没有水浸
+		"status": "leak" //leak:Flooding; no_leak:No flooding
 	}
 	
-### 二、获取网关sid及密码
+### Get the gateway sid and password
 
-#### 1. 打开米家APP - 点击多功能网关 - 点击右上角'...'进入设置 - 关于
+#### 1. Open Mijia APP - Click Multifunction Gateway - Click '...' in the upper right corner to enter settings - About
 
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/1.jpeg)
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/2.jpeg)
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/3.jpeg)
 
-#### 2. 在关于页面的下方空白处快速点击，直到隐藏菜单出现
+#### 2. Click quickly in the space below the page until the hidden menu appears
 
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/4.jpeg)
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/5.jpeg)
 
 
-#### 3. 点击-局域网通信协议，开启并复制随机生成密码
+#### 3. Click - LAN communication protocol, open and copy randomly generated password
 
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/6.jpeg)
 
-#### 4. 点击-网关信息
+#### 4. Click-gateway information
 
 ![](https://raw.githubusercontent.com/zzyss86/mi-aqara-sdk/master/images/7.jpeg)
 
-mac=后面的一串即为网关的SID，去掉“:”，转换成小写使用
+The string behind mac= is the gateway's SID. Remove the ":" and convert it to lowercase.
 
-----
-趁年底周末折腾了一下，祝大家2018春节快乐！
 
