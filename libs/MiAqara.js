@@ -10,27 +10,28 @@ const defaultConfig = {
     multicastAddress: '224.0.0.50',
     multicastPort: 4321,
     serverPort: 9898,
-    bindAddress: '' // SDK所在设备具有多网络时需要设置
+    bindAddress: '' // needs to be set when the device has multiple networks
 };
 
 class MiAqara {
 
     /**
-     * @param gateways 网关列表，支持数组或对象
-     * @param opts 服务配置信息
+     * @param gateways Gateway list, support for arrays or objects
+     * @param opts Service configuration information
      * */
     constructor (gateways, opts) {
-        // 服务配置信息
+        // Service configuration information
         opts = opts ? Object.assign({}, defaultConfig, opts) : defaultConfig;
         this.multicastAddress = opts.multicastAddress;
         this.multicastPort = opts.multicastPort;
         this.serverPort = opts.serverPort;
         this.bindAddress = opts.bindAddress;
+        this.debug = opts.debug ? opts.debug : false;
 
-        // 读取设备计数
+        // Reading device count
         this.readCount = 0;
 
-        // 事件
+        // Events
         this.onReady = opts.onReady;
         this.onMessage = opts.onMessage;
 
@@ -59,7 +60,7 @@ class MiAqara {
     }
 
     start () {
-        // 初始化SDK
+        // Initialize the SDK
         this.createSocket();
         this.initServerSocket();
         this.sendWhoisCommand();
@@ -77,11 +78,15 @@ class MiAqara {
         let that = this;
 
         serverSocket.on('error', function(err){
-            console.error('error, msg - %s, stack - %s\n', err.message, err.stack);
+            if (this.debug) {
+                console.error('error, msg - %s, stack - %s\n', err.message, err.stack);
+            }
         });
 
         serverSocket.on('listening', function(){
-            console.info(`server is listening on port ${that.serverPort}.`);
+            if (this.debug) {
+                console.info(`server is listening on port ${that.serverPort}.`);
+            }
             if (!that.bindAddress) {
                 serverSocket.addMembership(that.multicastAddress);
             } else {
@@ -102,36 +107,41 @@ class MiAqara {
                 data.data = JSON.parse(data.data);
             }
         } catch (e) {
-            console.error('Bad message: %s', msg);
+            if (this.debug) {
+                console.error('Bad message: %s', msg);
+            }
             return;
         }
         let cmd = data['cmd'];
-        console.log('[Message] cmd: %s, msg: ', cmd, msg.toString());
+
+        if (this.debug) {
+            console.log('[Message] cmd: %s, msg: ', cmd, msg.toString());
+        }
 
         if (cmd === 'iam') { // whois callback
             this.gatewayHelper.uploadBySid(data.sid, data);
-            this.gatewayHelper.getIdList(data.sid); // 更新子设备列表
+            this.gatewayHelper.getIdList(data.sid); // Update child device list
         } else if(cmd === 'get_id_list_ack') { // get_id_list callback
             this.gatewayHelper.uploadBySid(data.sid, data);
-            this.deviceMapsHelper.addOrUpdate(data.sid, data.data); // 更新网关与子设备的映射关系
-            this.deviceHelper.readAll(data.data); // 批量读取子设备详细信息
+            this.deviceMapsHelper.addOrUpdate(data.sid, data.data); // Update the mapping relationship between the gateway and child devices
+            this.deviceHelper.readAll(data.data); // Batch reading sub device details
             this.readCount += data.data.length;
-        } else if (cmd === 'report') { // 设备状态上报
+        } else if (cmd === 'report') { // Equipment status report
             this._addOrUpdate(data);
         } else if (cmd === 'read_ack') { // read callback
             this._addOrUpdate(data);
             this.readCount--;
-            if (this.readCount === 0) { // 所有设备读取完毕，触发onRead事件
+            if (this.readCount === 0) { // Read all devices, trigger onRead event
                 this.onReady && this.onReady(data);
             }
         } else if (cmd === 'write_ack') { // write callback
             this._addOrUpdate(data);
-        } else if(cmd === 'server_ack') { // 网关通用回复, 如发送报文JSON解析出错，会回复此事件
+        } else if(cmd === 'server_ack') { // Gateway common reply, such as sending message JSON parsing error, will reply this event
             // todo
-        } else if (cmd === 'heartbeat') {  // 心跳包
+        } else if (cmd === 'heartbeat') {  // Heartbeat package
             /**
-             * 网关每10秒钟发送一次, 主要更新网关token
-             * 子设备心跳，插电设备10分钟发送一次，其它1小时发送一次
+             * The gateway sends every 10 seconds, mainly updating the gateway token
+             * Heartbeat of the child device. The plug-in device sends it once every 10 minutes and once every other hour.
              * */
             this._addOrUpdate(data);
         }
@@ -143,31 +153,33 @@ class MiAqara {
         if (!data) {
            return;
         }
-        if (data['model'] === 'gateway') { // 网关
+        if (data['model'] === 'gateway') { // Gateway
             this.gatewayHelper.uploadBySid(data.sid, data);
-        } else { // 子设备
+        } else { // Child equipment
             this.deviceHelper.addOrUpdate(data);
         }
     }
 
     /**
-     * 消息发送
+     * Send message
      * @param {String} ip
      * @param {String} port
-     * @param {Object} msg 消息对象
+     * @param {Object} msg Message object
      * */
     send (ip, port, msg) {
         if (!ip || !port || !msg) {
             throw new Error('Param error');
         }
         let msgStr = utils.messageFormat(msg);
-        console.log("[Send] msg: %s", msgStr);
+        if (this.debug) {
+            console.log("[Send] msg: %s", msgStr);
+        }
         this.serverSocket.send(msgStr, 0, msgStr.length, port, ip);
     }
 
     /**
-     * 网关设备发现（设备发现不加密）
-     * 组播方式
+     * Gateway device discovery (device discovery is not encrypted)
+     * Multicast mode
      * */
     sendWhoisCommand () {
         this.send(this.multicastAddress, this.multicastPort, {

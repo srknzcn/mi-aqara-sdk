@@ -1,6 +1,6 @@
 /**
- * 网关辅助类
- * 管理多个网关
+ * Gateway assistance class
+ * Manage multiple gateways
  */
 const Gateway = require('./Gateway');
 const utils = require('./utils');
@@ -10,12 +10,12 @@ class GatewayHelper {
         if (!platform) {
             throw new Error('[GatewayHelper:constructor] Param error');
         }
-        this.gateways = {}; // 网关列表，sid->Gateway
+        this.gateways = {}; // Gateway list, sid->Gateway
         this.platform = platform;
     }
 
     /**
-     * 添加
+     * Add to
      * */
     add (gateway) {
         if (!gateway || !gateway.sid || this.gateways.hasOwnProperty(gateway.sid)) {
@@ -35,21 +35,21 @@ class GatewayHelper {
     }
 
     /**
-     * 移除
+     * Remove
      * */
     remove (sid) {
         delete this.gateways[sid];
     }
 
     /**
-     * 根据sid查找网关
+     * Find gateways based on sid
      **/
     getBySid (sid) {
         return this.gateways[sid];
     }
 
     /**
-     * 根据sid更新网关的属性
+     * Update the properties of the gateway based on the sid
      * */
     uploadBySid (sid, data) {
         if (this.gateways.hasOwnProperty(sid)) {
@@ -59,7 +59,7 @@ class GatewayHelper {
     }
 
     /**
-     * 获取网关列表数组
+     * Get an array of gateway lists
      * */
     getGatewayList () {
         let list = [];
@@ -75,7 +75,7 @@ class GatewayHelper {
     }
 
     /**
-     * 查询子设备id列表
+     * Query sub device id list
      * */
     getIdList (sid) {
         console.log('[GatewayHelper:getIdList] sid:%s', sid);
@@ -90,9 +90,9 @@ class GatewayHelper {
     }
 
     /**
-     * 读设备
+     * Reading equipment
      *
-     * @param {String} sid 网关设备ID
+     * @param {String} sid Gateway device ID
      * */
     read (sid) {
         console.log('[GatewayHelper:read] sid=%s', sid);
@@ -108,10 +108,10 @@ class GatewayHelper {
     }
 
     /**
-     * 写设备
+     * Write device
      *
-     * @param {String} sid 网关设备ID
-     * @param {Object} data 写入网关的数据
+     * @param {String} sid Gateway device ID
+     * @param {Object} data Write data to the gateway
      * */
     write (sid, data) {
         console.log('[GatewayHelper:write] sid=%s', sid);
@@ -123,7 +123,7 @@ class GatewayHelper {
                 sid: gateway.sid,
                 data: Object.assign({}, data)
             };
-            // 加密串
+            // Encrypted string
             msg.data.key = utils.cipher(gateway.token, gateway.password, gateway.iv);
             this.platform.send(gateway.ip, gateway.port, msg);
         } else {
@@ -132,13 +132,13 @@ class GatewayHelper {
     }
 
     /**
-     * 控制网关彩灯
-     * HSB颜色模式
-     * @param sid 网关设备ID
-     * @param {Boolean} power 开关
-     * @param hue 色相
-     * @param saturation 饱和度
-     * @param brightness 亮度
+     * Control gateway lantern
+     * HSB color mode
+     * @param sid Gateway device ID
+     * @param {Boolean} power switch
+     * @param hue Hue
+     * @param saturation Saturation
+     * @param brightness Brightness
      * */
     controlLight({sid, power, hue, saturation, brightness}) {
         let prepValue = 0;
