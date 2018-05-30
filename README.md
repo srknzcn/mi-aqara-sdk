@@ -91,11 +91,20 @@ Thanks to jsonzhou
 - opts.saturation: SATURATION
 - opts.brightness BRIGHTNESS
 
+#### Turn off the light
+	MiAqara.controlLight({sid:'7811dcb28bde',power:false});
+
+#### Turn on the light
+	MiAqara.controlLight({sid:'7811dcb28bde',power:true});
+
+
 ### playTone(opts) Plays tone on gateway
 
 - opts.sid: Gateway device ID
 - opts.mid: Tone OD
 - opts.vol: Tone volume
+
+Use 10000 as toneID for stop
 
 * Available tones:
      * 0 - Police car 1
@@ -136,11 +145,6 @@ Thanks to jsonzhou
      * 10005 - Alarm Sound 2
      * 10006 - Time beeps long
 
-#### Turn off the light
-	MiAqara.controlLight({sid:'7811dcb28bde',power:false});
-
-#### Turn on the light
-	MiAqara.controlLight({sid:'7811dcb28bde',power:true});
 	
 ### getDeviceBySid(sid) Get an array of all child devices (sensors)
 
