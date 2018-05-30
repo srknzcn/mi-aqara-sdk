@@ -1,9 +1,9 @@
 /**
- * 网关与子设备映射管理
+ * Gateway and Child Device Mapping Management
  */
 class DeviceMapsHelper {
     constructor () {
-        this.deviceMaps = {}; // 网关与子设备的映射，gatewaySid->[sid,sid2...]
+        this.deviceMaps = {}; // Gateway and child device mappings, gatewaySid->[sid,sid2...]
     }
 
     addOrUpdate (gatewaySid, deviceSids) {
@@ -15,7 +15,7 @@ class DeviceMapsHelper {
     }
 
     /**
-     * 根据网关ID查找设备ID列表
+     * Find Device ID List Based on Gateway ID
      * @return {Array}
      * */
     getDeviceSids (gatewaySid) {
@@ -23,7 +23,7 @@ class DeviceMapsHelper {
     }
 
     /**
-     * 根据设备ID查找所属网关ID
+     * Finding the gateway ID based on the device ID
      * */
     getGatewaySidByDeviceSid (deviceSid) {
         for (let gatewaySid in this.deviceMaps) {

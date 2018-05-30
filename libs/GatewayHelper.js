@@ -12,6 +12,7 @@ class GatewayHelper {
         }
         this.gateways = {}; // Gateway list, sid->Gateway
         this.platform = platform;
+        this.debug = platform.debug;
     }
 
     /**
@@ -78,7 +79,9 @@ class GatewayHelper {
      * Query sub device id list
      * */
     getIdList (sid) {
-        console.log('[GatewayHelper:getIdList] sid:%s', sid);
+        if (this.debug) {
+            console.log('[GatewayHelper:getIdList] sid:%s', sid);
+        }
         let gateway = this.getBySid(sid);
         if (gateway) {
             this.platform.send(gateway.ip, gateway.port, {
@@ -95,7 +98,10 @@ class GatewayHelper {
      * @param {String} sid Gateway device ID
      * */
     read (sid) {
-        console.log('[GatewayHelper:read] sid=%s', sid);
+        if (this.debug) {
+            console.log('[GatewayHelper:read] sid=%s', sid);
+        }
+
         let gateway = this.getBySid(sid);
         if (gateway) {
             this.platform.send(gateway.ip, gateway.port, {
@@ -114,7 +120,9 @@ class GatewayHelper {
      * @param {Object} data Write data to the gateway
      * */
     write (sid, data) {
-        console.log('[GatewayHelper:write] sid=%s', sid);
+        if (this.debug) {
+            console.log('[GatewayHelper:write] sid=%s', sid);
+        }
         let gateway = this.getBySid(sid);
         if (gateway) {
             let msg = {

@@ -1,5 +1,5 @@
 /**
- * 子设备 & 传感器设备辅助类
+ * Sub Devices & Sensors
  * */
 const Device = require('./Device');
 const utils = require('./utils');
@@ -11,6 +11,7 @@ class DeviceHelper {
         }
         this.devices = {};
         this.platform = platform;
+        this.debug = platform.debug;
     }
 
     add (device) {
@@ -22,7 +23,9 @@ class DeviceHelper {
 
     addOrUpdate (data) {
         if (!data) {
-            console.log('[DeviceHelper:addOrUpdate] data is null');
+            if (this.debug) {
+                console.log('[DeviceHelper:addOrUpdate] data is null');
+            }
             return;
         }
         let sid = data.sid;
@@ -121,7 +124,9 @@ class DeviceHelper {
      * @param {String} sid 子设备ID
      * */
     read (sid) {
-        console.log('[DeviceHelper:read] sid=%s', sid);
+        if (this.debug) {
+            console.log('[DeviceHelper:read] sid=%s', sid);
+        }
         let deviceMapsHelper = this.platform.deviceMapsHelper;
         let gatewaySid = deviceMapsHelper.getGatewaySidByDeviceSid(sid);
         let gatewayHelper = this.platform.gatewayHelper;
@@ -142,7 +147,10 @@ class DeviceHelper {
      * 批量读取
      * */
     readAll (sidList) {
-        console.log('[DeviceHelper:readAll] sidList=%s', sidList);
+        if (this.debug) {
+            console.log('[DeviceHelper:readAll] sidList=%s', sidList);
+        }
+
         if (!sidList || sidList.length === 0) {
             return;
         }
@@ -157,7 +165,10 @@ class DeviceHelper {
      * @param {String} sid 子设备ID
      * */
     write (sid) {
-        console.log('[DeviceHelper:write] sid=%s', sid);
+        if (this.debug) {
+            console.log('[DeviceHelper:write] sid=%s', sid);
+        }
+
         let device = this.getBySid(sid);
         let deviceMapsHelper = this.platform.deviceMapsHelper;
         let gatewaySid = deviceMapsHelper.getGatewaySidByDeviceSid(sid);
@@ -185,7 +196,10 @@ class DeviceHelper {
      * 改变子设备状态
      * */
     change ({sid, gatewaySid, model, data}) {
-        console.log('[DeviceHelper:change] sid=%s', sid);
+        if (this.debug) {
+            console.log('[DeviceHelper:change] sid=%s', sid);
+        }
+
         if (!data || !utils.isObject(data)) {
             console.error('[DeviceHelper:change] Param error');
             return;

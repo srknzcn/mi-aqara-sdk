@@ -1,5 +1,5 @@
 /**
- * 子设备报文解析
+ * Sub device packet resolution
  */
 
 const DEVICE_MAP = {
@@ -30,10 +30,10 @@ const DEVICE_MAP = {
 const STATUS = {
     OPEN: 'open',
     CLOSE: 'close',
-    MOTION: 'motion', // 有人移动
+    MOTION: 'motion', // Someone moves
     CLICK: 'click',
     DOUBLE_CLICK: 'double_click',
-    BOTH_CLICK: 'both_click', // 左右键同时按
+    BOTH_CLICK: 'both_click', // Press the left and right buttons at the same time
     ON: 'on',
     OFF: 'off'
 };
