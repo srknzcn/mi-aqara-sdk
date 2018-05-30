@@ -157,6 +157,55 @@ class GatewayHelper {
         }
         this.write(sid, {rgb: prepValue});
     }
+
+    /**
+     * Plays tone on gateway
+     * @param sid Gateway device ID
+     * @param mid Tone ID
+     * @param vol Volume
+     * 
+     * Available tones:
+     * 0 - Police car 1
+     * 1 - Police car 2
+     * 2 - Accident
+     * 3 - Countdown
+     * 4 - Ghost
+     * 5 - Sniper rifle
+     * 6 - Battle
+     * 7 - Air raid
+     * 8 - Bark
+     * 9 - None
+     * 10 - Doorbell
+     * 11 - Knock at a door
+     * 12 - Amuse
+     * 13 - Alarm clock
+     * 14 - None
+     * 15 - None
+     * 16 - None
+     * 17 - None
+     * 18 - None
+     * 19 - None
+     * 20 - MiMix
+     * 21 - Enthusiastic
+     * 22 - GuitarClassic
+     * 23 - IceWorldPiano
+     * 24 - LeisureTime
+     * 25 - ChildHood
+     * 26 - MorningStreamLiet
+     * 27 - MusicBox
+     * 28 - Orange
+     * 29 - Thinker
+     * 10000 - MUTE
+     * 10001 - Alarm Sound 3
+     * 10002 - Beep 2x
+     * 10003 - Time beep 3x
+     * 10004 - Alarm Sound 1
+     * 10005 - Alarm Sound 2
+     * 10006 - Time beeps long
+     */
+    playTone({sid, mid, vol}) {
+        this.write(sid, {mid: mid, vol: vol});
+    }
 }
 
 module.exports = GatewayHelper;
