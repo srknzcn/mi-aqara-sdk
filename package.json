@@ -1,7 +1,7 @@
 {
-  "name": "mi-aqara-sdk",
+  "name": "mi-aqara2-sdk",
   "version": "1.0.0",
-  "description": "xiaomi & aqara sdk",
+  "description": "xiaomi & aqara sdk v2",
   "main": "index.js",
   "scripts": {
   },
@@ -11,10 +11,10 @@
     "xiaomi",
     "sdk"
   ],
-  "author": "jsonzhou",
+  "author": "srknzcn",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zzyss86/mi-aqara-sdk.git"
+    "url": "git+https://github.com/srknzcn/mi-aqara2-sdk.git"
   },
   "license": "ISC"
 }

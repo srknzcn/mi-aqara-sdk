@@ -66,6 +66,10 @@ class MiAqara {
         this.sendWhoisCommand();
     }
 
+    stop () {
+        this.serverSocket.close();
+    }
+
     createSocket () {
         this.serverSocket = dgram.createSocket({
             type: 'udp4',
